@@ -28,7 +28,7 @@ services:
     logging:
       driver: "local"            
     volumes:
-      - sqlitehuey:/app
+      - sqlitehuey:/sqlitehuey
       - type: bind
         source: ./configs/django/prod
         target: /app/server/django_configs
@@ -60,7 +60,7 @@ services:
     ports:
       - ${HOST_HTTP_PORT:-4000}:${HOST_HTTP_PORT:-4000}      
     volumes:
-      - sqlitehuey:/app
+      - sqlitehuey:/sqlitehuey
       - type: bind
         source: ./configs/django/prod
         target: /app/server/django_configs

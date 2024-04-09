@@ -64,7 +64,7 @@ services:
       dockerfile: ./Dockerfile
       target: development
     volumes:
-      - sqlitehuey:/app
+      - sqlitehuey:/sqlitehuey
       - type: bind
         source: ./configs/django/localdev
         target: /app/server/django_configs

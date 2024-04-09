@@ -48,6 +48,7 @@ settings.DJOSER['WEBAUTHN'] = {
 
 settings.HUEY['immediate'] = False
 settings.HUEY['consumer']['workers'] = 4
+settings.HUEY['filename'] = '/sqlitehuey/sqlitehuey.db'
 
 # ROUT
 
