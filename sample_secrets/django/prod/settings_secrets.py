@@ -1,0 +1,18 @@
+SECRET_KEY = "<AVERYSECRETKEY>"
+
+
+# Set as needed
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = 'XXXX.XXX'
+#EMAIL_PORT = 25
+#EMAIL_HOST_USER = 'XXXX'
+#EMAIL_HOST_PASSWORD = 'XXXX'
+
+
+# SURV
+
+SURV_SECRET = {
+    'SERVER_KEY': 'XXXXXXXXXXXXXXXX',
+}
+

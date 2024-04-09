@@ -1,0 +1,79 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "envHOST_HTTP_PORT",
+            "type": "command",
+            "command": "extension.commandvariable.file.content",
+            "args": {
+                "fileName": "${workspaceFolder}/.env",
+                "key": "HOST_HTTP_PORT",
+                "default": "4000"
+            }
+        }
+    ],
+    "configurations": [
+        {
+            "name": "mobashi-main",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/mobashi-main/manage.py",
+            "args": [
+                "runserver",
+                "0.0.0.0:${input:envHOST_HTTP_PORT}"
+            ],
+            "django": true,
+            "justMyCode": false
+        },
+        {
+            "name": "harvest",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolderBasename}/manage.py",
+            "args": [
+                "harvest",
+                "unused"
+            ],
+            "django": true,
+            "justMyCode": false
+        },
+        {
+            "name": "harvest async",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolderBasename}/manage.py",
+            "args": [
+                "harvest",
+                "async"
+            ],
+            "django": true,
+            "justMyCode": false
+        },
+        {
+            "name": "run_huey",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolderBasename}/manage.py",
+            "args": [
+                "run_huey"
+            ],
+            "django": true,
+            "justMyCode": false
+        },
+        {
+            "name": "redo_routing",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolderBasename}/manage.py",
+            "args": [
+                "redo_routing",
+                "foot"
+            ],
+            "django": true,
+            "justMyCode": false
+        },
+    ]
+}
