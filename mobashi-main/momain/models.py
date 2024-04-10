@@ -212,11 +212,11 @@ class Cascho(RulesModel, ByUserMixin):
             # only a proper admin can assign a School to a Campaign (has_role() do NOT work here)
             # only a proper admin can modify an assignment of a School to a Campaign
             # only a proper admin can delete an assignment of a School to a Campaign
-            # anyone with any Role can view an assignment of a School to a Campaign
+            # a Principal can view an assignment of a School to a Campaign
             "add": rules.is_group_member('momain_admin'),
             "change": rules.is_group_member('momain_admin'),
             "delete": rules.is_group_member('momain_admin'),
-            "view": rules.is_group_member('momain_admin') | has_role('__any__', 'caschos')
+            "view": rules.is_group_member('momain_admin') | has_role('principal', 'caschos')
         }
 
     def __str__(self):
