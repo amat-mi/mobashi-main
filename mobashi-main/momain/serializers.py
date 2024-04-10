@@ -91,10 +91,14 @@ class SchoolSerializer(PermsMixin, serializers.ModelSerializer):
         fields = '__all__'
 
     def get_users(self, obj):
+        user = self.context.get("request").user
+        is_momain_admin = rules.is_group_member('momain_admin')(user)
         res = []
         for role in obj.roles.order_by('-kind').all():
-            for user in role.users.all():
-                if not is_username(obj, role.kind, user.username):
+            for user in role.users.all():  
+                # only proper admin can see all Users of a School, 
+                # other Users only see Users created by "ensure_user()" method
+                if not is_momain_admin and not is_username(obj, role.kind, user.username):
                     continue
                 data = InnerUserSerializer(user).data
                 data['role'] = role.pk

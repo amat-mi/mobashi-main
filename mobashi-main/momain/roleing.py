@@ -28,7 +28,7 @@ def build_password():
     return get_random_string(10)
 
 
-def ensure_user(school: School, kind: str, request, email: str = None):
+def ensure_user(school: School, kind: str, request, is_momain_admin: bool, email: str = None):
     if not email:
         email = school.email
     if not email:
@@ -58,17 +58,15 @@ def ensure_user(school: School, kind: str, request, email: str = None):
 
         # If User created, or "email" changed, must reset its password too
         if created or res.email != email:
-            reset_password(school, kind, res.pk, request, email=email)
+            reset_password(school, kind, res.pk, request,
+                           is_momain_admin, email=email)
 
         return res, created
 
 
-def reset_password(school: School, kind: str, user_pk: int, request, email: str = None):
+def reset_password(school: School, kind: str, user_pk: int, request, is_momain_admin: bool, email: str = None):
     if not email:
         email = school.email
-    if not email:
-        raise ValueError(
-            _('No "email" specified and empty "email" field in School'))
 
     with transaction.atomic():
         if not school.roles.filter(users=user_pk).exists():
@@ -76,11 +74,21 @@ def reset_password(school: School, kind: str, user_pk: int, request, email: str 
 
         user = get_object_or_404(User, pk=user_pk)
 
+        # If the "username" of User to reset password for didn't come from "build_username()" method,
+        # only a proper Admin can reset it's password
+        # If instead the "username" did come from "build_username()" method, set the User "email" field,
+        # but only if there actually is one
         if user.username != build_username(school, kind):
-            raise ValueError(_('Specified User is not specific to School'))
+            if not is_momain_admin:
+                raise ValueError(_('Specified User is not specific to School'))
+        elif email:
+            user.email = email
+            user.save()
 
-        user.email = email
-        user.save()
+        # User must have the "email" field set somehow, or it's an error
+        if not user.email:
+            raise ValueError(
+                _('No "email" specified and empty "email" field in School and empty "email" field in User'))
 
         # from Djoser.views.reset_password()
         context = {"user": user}
@@ -90,7 +98,7 @@ def reset_password(school: School, kind: str, user_pk: int, request, email: str 
         return user, True
 
 
-def remove_user(school: School, kind: str, user_pk: int, role_pk: int):
+def remove_user(school: School, kind: str, user_pk: int, role_pk: int, is_momain_admin: bool):
     role = get_object_or_404(Role, pk=role_pk)
 
     with transaction.atomic():
@@ -100,8 +108,11 @@ def remove_user(school: School, kind: str, user_pk: int, role_pk: int):
 
         user = get_object_or_404(User, pk=user_pk)
 
+        # If the "username" of User to reset password for didn't come from "build_username()" method,
+        # only a proper Admin can remove it
         if user.username != build_username(school, kind):
-            raise ValueError(_('Specified User is not specific to School'))
+            if not is_momain_admin:
+                raise ValueError(_('Specified User is not specific to School'))
 
         role.users.remove(user)
 

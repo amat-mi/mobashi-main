@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound
 from rest_framework.decorators import action
 from rest_framework.response import Response
+import rules
 from .models import Cascho, Campaign, School, Role, Trip, Stage, Network, \
     ViewDash, ViewDashheat, ViewDashtrip, ViewDashlink
 from .serializers import StageSerializer, TripSerializer, CaschoSerializer, CampaignSerializer, SchoolSerializer, RoleSerializer, \
@@ -32,7 +33,7 @@ class SchoolRoleViewSet(SpecialAutoPermissionViewSetMixin, mixins.UpdateModelMix
 
     def update(self, request, *args, **kwargs):
         try:
-            action = self.request.data.get('action', '')
+            action = request.data.get('action', '')
             method = getattr(self, 'handle_' + action, None)
             if not method:
                 raise ValueError('Invalid action')
@@ -40,9 +41,10 @@ class SchoolRoleViewSet(SpecialAutoPermissionViewSetMixin, mixins.UpdateModelMix
             kind = self.request.data.get('kind', None)
             if not kind or kind not in ['principal', 'mobman']:
                 raise ValueError('Invalid kind')
+            is_momain_admin = rules.is_group_member('momain_admin')(request.user)        
             lang = self.request.data.get('lang', None)
             with translation.override(lang):
-                return method(request, school, kind)
+                return method(request, school, kind, is_momain_admin)
         except ValueError as exc:
             return Response({
                 'error': 'BAD_REQUEST',
@@ -54,11 +56,11 @@ class SchoolRoleViewSet(SpecialAutoPermissionViewSetMixin, mixins.UpdateModelMix
                 'message': '{}'.format(str(exc)).encode("utf-8")
             }, status=HttpResponseServerError.status_code)
 
-    def handle_ensure_user(self, request, school, kind):
+    def handle_ensure_user(self, request, school, kind, is_momain_admin):
         # NOOO!!! Always use School EMail!!!
         # email = self.request.data.get('email', None)
         email = None
-        user, created = ensure_user(school, kind, request, email=email)
+        user, created = ensure_user(school, kind, request, is_momain_admin, email=email)
         return Response({
             'id': user.pk if user else None,
             'email': user.email if user else None,
@@ -66,7 +68,7 @@ class SchoolRoleViewSet(SpecialAutoPermissionViewSetMixin, mixins.UpdateModelMix
             'created': created
         })
 
-    def handle_reset_password(self, request, school, kind):
+    def handle_reset_password(self, request, school, kind, is_momain_admin):
         user_pk = self.request.data.get('user', None)
         if not user_pk:
             raise ValueError('Invalid user')
@@ -74,21 +76,21 @@ class SchoolRoleViewSet(SpecialAutoPermissionViewSetMixin, mixins.UpdateModelMix
         # email = self.request.data.get('email', None)
         email = None
         user, reset = reset_password(
-            school, kind, user_pk, request, email=email)
+            school, kind, user_pk, request, is_momain_admin, email=email)
         return Response({
             'id': user.pk if user else None,
             'email': user.email if user else None,
             'reset': reset
         })
 
-    def handle_remove_user(self, request, school, kind):
+    def handle_remove_user(self, request, school, kind, is_momain_admin):
         user_pk = self.request.data.get('user', None)
         if not user_pk:
             raise ValueError('Invalid user')
         role_pk = self.request.data.get('role', None)
         if not role_pk:
             raise ValueError('Invalid role')
-        user, removed = remove_user(school, kind, user_pk, role_pk)
+        user, removed = remove_user(school, kind, user_pk, role_pk, is_momain_admin)
         return Response({
             'id': user.pk if user else None,
             'removed': removed
