@@ -16,7 +16,7 @@ def request(method, path, data):
         url = f"{config['SERVER_URL']}/surv/{path}/"
         key = secret['SERVER_KEY']
         headers = {'Authorization': f'Token {key}'}
-        res = httpx.request(method, url, headers=headers, data=data)
+        res = httpx.request(method, url, headers=headers, json=data)
         res.raise_for_status()
 
         # should do something with the result!!!

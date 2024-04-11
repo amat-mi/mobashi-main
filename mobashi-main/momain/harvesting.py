@@ -69,7 +69,7 @@ def harvest():
                 stage.save()
 
             url = f"{config['SERVER_URL']}/surv/harvests/{trip.extid}/"
-            res = httpx.patch(url, headers=headers, data={"status": 100})
+            res = httpx.patch(url, headers=headers, json={"status": 100})
             # should do something with the result!!!
     except Exception as exc:
         raise HandledError from exc  # raise special error with Exception as __cause__
