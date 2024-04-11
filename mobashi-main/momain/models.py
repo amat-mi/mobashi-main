@@ -153,6 +153,7 @@ class Campaign(RulesModel, ByUserMixin):
         School, related_name='campaigns', blank=True,
         through='Cascho',
         help_text=_('Schools this campaign is about'))
+    survey = models.JSONField(null=False, blank=True, default=dict)
 
     class Meta:
         verbose_name = _('Campaign')
@@ -182,6 +183,10 @@ class Campaign(RulesModel, ByUserMixin):
                 else self.Status.AFTER if now >= self.stamp_end \
                 else self.Status.ACTIVE
         return self.Status.DISABLED
+
+    @property
+    def status_label(self):
+        return self.status.label
 
     @property
     def is_active(self):

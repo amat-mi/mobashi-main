@@ -127,8 +127,10 @@ class CampaignAdmin(BaseAdmin):
     school_links.short_description = _('Schools')
 
     list_display = ("__str__", "uuid", "school_links",
-                    "stamp_start", "stamp_end")
-    search_fields = ("name", "uuid", "schools__name",)
+                    "stamp_start", "stamp_end", "status_label")
+    search_fields = ("name", "uuid",
+                     "schools__name", "schools__uuid",
+                     )
     autocomplete_fields = ("schools",)
 
 
