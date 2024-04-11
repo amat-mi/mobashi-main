@@ -129,7 +129,7 @@ class SyncCampaignSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Campaign
-        fields = ['uuid', 'name', 'stamp_start', 'stamp_end']
+        fields = ['uuid', 'name', 'stamp_start', 'stamp_end', 'survey']
 
 
 class CaschoSerializer(QRCodeSerializerMixin, PermsMixin, serializers.ModelSerializer):
