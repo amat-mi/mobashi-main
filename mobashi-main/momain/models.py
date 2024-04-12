@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from uuid import uuid4
+import json
 import rules
 from rules.contrib.models import RulesModel
 from django.utils.translation import gettext_lazy as _
@@ -195,6 +196,14 @@ class Campaign(RulesModel, ByUserMixin):
     def save(self, *args, **kwargs):
         if self._state.adding:
             self.uuid = uuid4()
+
+        # If "survey" is empty, set it with a default template, if any
+        if not self.survey:
+            config = settings.SURV_CONFIG or {}
+            template = config.get('TEMPLATE_01', None)
+            if template:
+                self.survey = json.loads(template)
+
         super(Campaign, self).save(*args, **kwargs)
 
     def schools_abbrev(self):
