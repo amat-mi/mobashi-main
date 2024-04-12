@@ -50,6 +50,6 @@ def sinc_cascho(campaign_uuid: str, school_uuid: str, add_school: bool):
     else:
         path = f"campaigns/{campaign_uuid}/remove_school"
     data = {
-        'school_uuid': school_uuid
+        'school_uuid': str(school_uuid)         #it may be an UUID field object
     }
     request(method, path, data)
